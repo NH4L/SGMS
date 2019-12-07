@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+
+<html>
+<!--Created by IntelliJ IDEA.-->
+<!--User: Chaoyu Li-->
+<!--Date: 2019-12-02-->
+<!--Time: 22:39-->
+<!--To change this template use File | Settings | File Templates.-->
+<head>
+	<meta charset="utf-8">
+	<meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<title>学生信息管理</title>
+	<link rel="stylesheet" href="./layer/theme/default/layer.css">
+	<link rel="stylesheet" type="text/css" href="./css/reponse.css">
+	<link rel="stylesheet" type="text/css" href="./css/lib/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="./css/custom.css">
+	<link rel="stylesheet" type="text/css" href="css/page.css">
+	<script src="./js/echarts.min.js"></script>
+	<style type="text/css">
+		.alertceng{
+			background: #FFFFFF;
+			padding: 10px;
+			display: none;
+		}
+		.alertceng span.title{
+			margin-right: 10px;
+		}
+	</style>
+</head>
+<body>
+	<div class="layui-fluid layadmin-homepage-fluid" style="background: #fff;width:90%;margin:0 auto;">
+		<div id="page">
+			<h1>学生成绩信息管理</h1>
+			<table id="table" class="reponsetable" ></table>
+			<div id="pager" class="pager clearfix"></div>
+			<script type="text/html" id="editer">
+				<a class="layui-btn layui-btn-xs" onclick="edittr(this)">修改</a>
+		 		<a class="layui-btn layui-btn-xs" onclick="deletetr(this)">删除</a>
+				<a class="layui-btn layui-btn-xs" onclick="uptr(this)">上移</a>
+				<a class="layui-btn layui-btn-xs" onclick="downtr(this)">下移</a>
+		    </script>
+		    <div class="btn-container">
+				<button class="layui-btn" onclick="addNew();">新增信息</button>
+			</div>
+			<form class="form-horizontal" id="input_form" onsubmit="return submitInfo();">
+				<fieldset>
+					<!-- Form Name -->
+					<legend>学生信息录入</legend>
+
+					<!-- Multiple Radios (inline) -->
+					<div class="control-group" id="radio_major">
+  							<label class="control-label">专业</label>
+  							<div class="controls">
+    							<label class="radio inline">
+      								<input type="radio" name="radio_major" id="radio_computer" value="1" checked="checked">
+      								计算机
+    							</label>
+    							<label class="radio inline">
+      								<input type="radio" name="radio_major" id="radio_iot" value="2">
+      								物联网
+    							</label>
+    							<label class="radio inline">
+      								<input type="radio" name="radio_major" id="radio_tongxin" value="3">
+      								通信
+    							</label>
+  							</div>
+					</div>
+
+					<!-- Select Basic -->
+					<div class="control-group">
+  							<label class="control-label">年级</label>
+  							<div class="controls">
+    							<select id="select_grade" name="selectbasic-0" class="input-xlarge">
+      								<option>2015</option>
+      								<option>2016</option>
+      								<option>2017</option>
+      								<option>2018</option>
+      								<option>2019</option>
+    							</select>
+  							</div>
+					</div>
+
+					<!-- Text input-->
+					<div class="control-group">
+  							<label class="control-label" >学号</label>
+  							<div class="controls">
+    							<input id="input_id" name="input_id" type="text" class="input-xlarge" placeholder="student id" onblur="return checkId();">
+    							<label id="idNumWarn"> </label>
+  							</div>
+					</div>
+
+					<!-- Text input-->
+					<div class="control-group">
+  							<label class="control-label">姓名</label>
+  							<div class="controls">
+    							<input id="input_name" name="input_name" type="text" placeholder="student name" class="input-xlarge" onblur="return checkName();">
+    							<label id="nameWarn"> </label>
+  							</div>
+					</div>
+
+					<!-- Multiple Radios (inline) -->
+					<div class="control-group"  id="radio_sex">
+  							<label class="control-label">性别</label>
+  							<div class="controls">
+    							<label class="radio inline">
+      								<input type="radio" name="radio_sex" id="radio_man" value="1" checked="checked">
+      								男
+    							</label>
+    							<label class="radio inline">
+      								<input type="radio" name="radio_sex" id="radio_women" value="2">
+      								女
+    							</label>
+  							</div>
+					</div>
+
+					<!-- Multiple Radios (inline) -->
+					<div class="control-group"  id="radio_subject">
+  							<label class="control-label" >科目</label>
+  							<div class="controls">
+								<label class="radio inline">
+									<input type="radio" name="radio_subject" id="radio_java" value="1">
+									java语言程序设计
+								</label>
+								<label class="radio inline">
+      								<input type="radio" name="radio_subject" id="radio_math" value="2" checked="checked">
+									高等数学
+    							</label>
+    							<label class="radio inline">
+      								<input type="radio" name="radio_subject" id="radio_eng" value="3">
+									大学英语
+    							</label>
+  							</div>
+					</div>
+
+					<!-- Text input-->
+					<div class="control-group">
+  							<label class="control-label">成绩</label>
+  							<div class="controls">
+    							<input id="input_score" name="input_score" type="text" placeholder="score <=100" class="input-xlarge" onblur="return checkScore();">
+    							<label id="scoreWarn"> </label>
+  							</div>
+					</div>
+
+				</fieldset>
+				<div class="btn-container" style="display:none" id="btn_edit">
+					<button class="layui-btn" onclick="return editInfo();">确认修改</button>
+				</div>
+				<div class="btn-container" style="display:block" id="btn_add">
+					<button class="layui-btn" type="submit" >提交</button>
+				</div>
+			</form>
+		
+			<legend>学生成绩统计</legend>
+			<div id="studentStatistics">
+				<div id="studentSum" style="width:500px;height:300px;"></div>
+				<div id="subjectAvg" style="width:500px;height:300px;"></div>
+			</div>
+			<div id="btn_bottom">
+				<div class="btn-container" style="display:block;" id="btn_statistics">
+					<button class="layui-btn" onclick="execStatistics()">更新信息</button>
+				</div>
+				<h6>©copyright  1762810130_李朝宇</h6>
+			</div>
+		</div>
+	</div>
+	<div id="editcontent" class="alertceng">
+			<p><span class="title">专业:</span><input type="text" id="major"/></p>
+			<p><span class="title">年级:</span><input type="text" id="grade"/></p>
+			<p><span class="title">学号:</span><input type="text" id="id"/></p>
+			<p><span class="title">姓名:</span><input type="text" id="name"/></p>
+			<p><span class="title">性别:</span><input type="text" id="sex"/></p>
+			<p><span class="title">科目:</span><input type="text" id="subject"/></p>
+			<p><span class="title">成绩:</span><input type="text" id="score"/></p>
+	</div>
+</body>
+<script src="https://www.jq22.com/jquery/jquery-1.10.2.js"></script>
+<script type="text/javascript" src="./js/jquery.basictable.min.js"></script>
+<script type="text/javascript" src="./js/reponsetable.min.js"></script>
+<script type="text/javascript" src="layer/layer.js"></script>
+<script type="text/javascript" src="./js/jquery.z-pager.js" charset="utf-8"></script>
+<script type="text/javascript">
+	//声明两张图表，一共获得总成绩，一共获得课程平均成绩
+    var app_sum = echarts.init(document.getElementById('studentSum'));
+    var app_avg = echarts.init(document.getElementById('subjectAvg'));
+
+	$(function(){				//原始数据，json构建
+		$('#table').basictable({
+			breakpoint: 768
+		});
+		$("#table").reponsetable({
+			"id":"table",
+			"operation": "editer",
+			"type":"numbers",
+			"colum": [
+				{"field": "major","title": "专业"},
+				{"field": "grade","title": "年级"},
+				{"field": "id","title": "学号"},
+				{"field": "name","title": "姓名"},
+				{"field": "sex","title": "性别"},
+				{"field": "subject","title": "科目"},
+				{"field": "score","title": "成绩"}
+			],
+			"data": []
+		});
+		//通过分页按钮加载对应页数的学生信息
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/sgms/PageTableServlet",
+            contentType: "application/x-www-form-urlencoded;charset=utf-8",
+            data: "page=" + 1,
+            success: function (data) {
+                console.log(data);
+                clearTable();
+                for (var i = 0; i < data.length; i++) {
+                    var obj = {
+                        "major": data[i]['specialty'],
+                        "grade": data[i]['grade'],
+                        "id": data[i]['studentNo'],
+                        "name": data[i]['studentName'],
+                        "sex": data[i]['studentSex'],
+                        "subject":data[i]['subjectName'],
+                        "score":data[i]['studentScore']
+                    };
+                    reponse.addtr(obj, "table");
+                }
+            },
+            error: function () {
+                alert("访问繁忙，请重试")
+            }
+        });
+        //获取分数记录的条数
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/sgms/GetScoreNumServlet",
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                // console.log(data);
+                var scoreCount = data["scoreCount"];
+                // console.log(scoreCount);
+                $("#pager").zPager({
+                    totalData: scoreCount,//从后台加载出来一共有多少条学生成绩信息
+                    pageData: 2,//设置每页有两条数据
+                    current: 1,
+                    htmlBox: $('#wraper'),
+                    btnShow: true,
+                    ajaxSetData: false
+                });
+            },
+            error: function () {
+                alert("访问繁忙，请重试")
+            }
+        });
+
+
+        // $.ajax({
+        //     type: "POST",
+        //     dataType: "json",
+        //     url: "/sgms/LoadStudentServlet" ,
+        //     contentType: "application/json;charset=utf-8",
+        //     // data: 'req="LoadStudent"',
+        //     success: function(data){
+		// 		console.log(data);
+        //         for (var i = 0; i < data.length; i++) {
+        //             var obj = {
+        //                 "major": data[i]['specialty'],
+        //                 "grade": data[i]['grade'],
+        //                 "id": data[i]['studentNo'],
+        //                 "name": data[i]['studentName'],
+        //                 "sex": data[i]['studentSex'],
+        //                 "subject":data[i]['subjectName'],
+        //                 "score":data[i]['studentScore']
+        //             };
+        //             reponse.addtr(obj, "table");
+        //         }
+        //     },
+        //     error: function () {
+        //         alert("访问繁忙，请重试")
+        //     }
+        // });
+
+        //开始就更新统计信息
+        getStudentStatisticsInfo();
+	});
+
+	//具体点击哪一分页
+    function currentPage(currentPage){
+        console.log("当前页码数：" + currentPage);
+        $(function() {
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "/sgms/PageTableServlet",
+                contentType: "application/x-www-form-urlencoded;charset=utf-8",
+                data: "page=" + currentPage,
+                success: function (data) {
+                    console.log(data);
+                    clearTable();
+                    for (var i = 0; i < data.length; i++) {
+                        var obj = {
+                            "major": data[i]['specialty'],
+                            "grade": data[i]['grade'],
+                            "id": data[i]['studentNo'],
+                            "name": data[i]['studentName'],
+                            "sex": data[i]['studentSex'],
+                            "subject":data[i]['subjectName'],
+                            "score":data[i]['studentScore']
+                        };
+                        reponse.addtr(obj, "table");
+                    }
+                },
+                error: function () {
+                    alert("访问繁忙，请重试")
+                }
+            });
+        });
+    }
+	//清除表格中数据，用于分页时先清空再写入数据
+	function clearTable() {
+		reponse.reloadtable([], "table")
+    }
+
+    function checkId() {//检查学号是否合适
+    	var id = $("#input_id").val();
+
+        if(id == "" || id == null) {
+            $("#idNumWarn").html("学号不能为空！");
+            return false;
+        } else if (!checkIdReg(id)) {
+            $("#idNumWarn").html("学号必须为8为数字！");
+            return false;
+        } else {
+        	$("#idNumWarn").html("");
+        	//获取专业
+            var major;
+            var majorValue = $('input:radio[name="radio_major"]:checked').val();
+            if (majorValue==1) {
+                major = "计算机";
+            } else if (majorValue==2) {
+                major = "物联网";
+            } else {
+                major = "通信";
+            }
+            //获取年级
+            var grade = $("#select_grade option:selected").text();
+
+            $.ajax({
+                type: "POST",
+                dataType: "text",
+                url: "/sgms/ReqStudentNameServlet" ,
+                contentType: "application/x-www-form-urlencoded;charset=utf-8",
+                data: "specialty=" + major + "&grade=" + grade + "&studentNo=" + id,
+                success: function(data){
+					if (data == "fail") {
+					    alert("不存在此用户信息，请重新输入");
+                        $('#input_name').val("");
+						return false;
+					} else {
+					    console.log(data);
+                        $('#input_name').val(data);
+                        return true;
+					}
+                },
+                error: function () {
+                    alert("访问繁忙，请重试");
+					return false;
+                }
+            });
+
+            return true;
+
+
+        }
+    }
+
+    function checkName() {//检查姓名是否合适
+    	var name = $("#input_name").val();
+        if(name == "" || name == null) {
+            $("#nameWarn").html("姓名不能为空！");
+            return false;
+        } else if (!checkNameReg(name)) {
+        	$("#nameWarn").html("姓名必须为2-4个汉字");
+            return false;
+        } else {
+        	$("#nameWarn").html("")
+        	return true
+        }
+    }
+
+    function checkScore() {//检查分数是否合适
+    	var score = $("#input_score").val();
+        if(score == "" || score == null) {
+            $("#scoreWarn").html("分数不能为空！");
+            return false;
+        } else if (!checkScoreReg(score)) {
+        	$("#scoreWarn").html("分数必须是0-100！");
+            return false;
+        } else {
+        	$("#scoreWarn").html("");
+        	return true
+        }
+    }
+
+    function checkIdReg(theObj) {//正则判断学号是否合格
+  		var reg = /^\d{8}$/;
+  		if (reg.test(theObj)) {
+   			return true;
+  		}
+  		return false;
+	}
+
+	function checkNameReg(theObj) {//正则判断姓名是否合格
+  		var reg = /^[\u4e00-\u9fa5]{2,4}$/;
+  		if (reg.test(theObj)) {
+   			return true;
+  		}
+  		return false;
+	}
+	
+	function checkScoreReg(theObj) {//正则判断分数是否合格
+  		var reg = /^[0-9]+.?[0-9]*$/;
+  		if (reg.test(theObj)) {
+  			if ((parseInt(theObj) <= 100) && (parseInt(theObj) >= 0)) {
+  				return true;
+  			} 
+  		}
+  		return false;
+	}
+	//提交数据
+	function submitInfo() {//提交表单信息，表中有的所有信息的判定如上方法
+		if ((!checkId()) || (!checkName()) && (!checkScore())) {
+			return false	
+		}
+		var major;
+		var majorValue = $('input:radio[name="radio_major"]:checked').val();
+		if (majorValue==1) {
+			major = "计算机";
+		} else if (majorValue==2) {
+			major = "物联网";
+		} else {
+			major = "通信";
+		}
+		
+		var grade = $("#select_grade option:selected").text();
+		var id = $("#input_id").val()
+	    var name = $("#input_name").val()
+
+		var sex;
+	    var sexValue = $('input:radio[name="radio_sex"]:checked').val();
+		if (sexValue==1) {
+			sex = "男";
+		} else {
+			sex = "女";
+		}
+
+		var subject;
+		var subjectValue = $('input:radio[name="radio_subject"]:checked').val();
+		if (subjectValue==1) {
+			subject = "java语言程序设计";
+		} else if (subjectValue==2) {
+			subject = "高等数学";
+		} else {
+			subject = "大学英语";
+		}
+
+		var score = $("#input_score").val();
+
+		var obj = {
+				"major":major,
+			  	"grade": grade,
+			  	"id": id,
+			  	"name": name,
+			  	"sex": sex,
+				"subject":subject,
+				"score":score
+			  };
+        var obj2 = {
+            "specialty":major,
+            "grade": grade,
+            "studentNo": id,
+            "studentName": name,
+            "studentSex": sex,
+            "subjectName": subject,
+            "studentScore": parseFloat(score)
+        };
+
+		var idSubject = getData();
+		var inputIdSubject = id + "_" + subject;
+		if (idSubject.indexOf(inputIdSubject)>=0) {
+			alert("学号和科目重复，请重新填写！");
+			return false;
+		} else {
+		    console.log(JSON.stringify(obj2));
+            $(function() {
+                $.ajax({
+                    type: "POST",
+                    dataType: "text",
+                    url: "/sgms/AddStudentServlet",
+                    contentType: "application/json;charset=utf-8",
+                    data: JSON.stringify(obj2),
+                    success: function (data) {
+                        alert("添加学生成绩信息成功");
+                        if (data == "success") {
+                            reponse.addtr(obj, "table");
+                            $('#input_id').val("");
+                            $('#input_name').val("");
+                            $('#input_score').val("");
+                        } else {
+                            alert("请勿重复添加成绩");
+                            return false;
+                        }
+                    },
+                    error: function () {
+                        alert("访问繁忙，请重试")
+                    }
+                });
+            });
+		}
+
+		return false;
+	}
+	//获取表格中的数据
+	function getData() {		//获取所有的学号+科目的信息，并形成一个数组返回
+		var ids = reponse.Columndata("id", "table");
+		var subjects = reponse.Columndata("subject", "table");
+		var obj = [];
+		for (var i = 0; i < ids.length; i++) {
+			obj.push(ids[i] + "_" + subjects[i])
+		}
+		// console.log(obj);
+		return obj;
+	}
+	//编辑学生信息
+	function edittr(a, e) {//修改 ：将原来新重新写入表单//转换修改按钮和确认提交表单按钮，一个表示修改信息，一个表示提交表单
+		document.getElementById("btn_edit").style.display = "block";
+        document.getElementById("btn_add").style.display = "none";
+
+		var tr = $(a).parent().parent();
+		reponse.resiverowdata(tr, "table");
+		var rowdata=$("#table").data("rowdata");
+		//alert(JSON.stringify(rowdata));
+
+		var edit_major = rowdata["major"];
+		if (edit_major=="计算机") {
+			$("#radio_computer").attr("checked","checked");
+			$("#radio_iot").removeAttr("checked");
+			$("#radio_tongxin").removeAttr("checked");
+		} else if (edit_major=="物联网") {
+			$("#radio_iot").attr("checked","checked");
+			$("#radio_computer").removeAttr("checked");
+			$("#radio_tongxin").removeAttr("checked");
+		} else if (edit_major=="通信") {
+			$("#radio_tongxin").attr("checked","checked");
+			$("#radio_computer").removeAttr("checked");
+			$("#radio_iot").removeAttr("checked");
+		}
+        $("#radio_computer").attr("disabled", true);
+        $("#radio_iot").attr("disabled", true);
+        $("#radio_tongxin").attr("disabled", true);
+
+		var edit_grade = rowdata["grade"];
+		$("#select_grade option:selected").text(edit_grade);
+        $("#select_grade").attr("disabled", true);
+
+		var edit_id = rowdata["id"];
+		$('#input_id').val(edit_id);
+        $("input[name='input_id']").attr("disabled", true);
+
+		var edit_name = rowdata["name"];
+		$('#input_name').val(edit_name);
+        $("input[name='input_name']").attr("disabled", true);
+
+		var edit_sex = rowdata["sex"];
+		if (edit_sex=="男") {
+			$("#radio_man").attr("checked","checked");
+			$("#radio_women").removeAttr("checked");
+		} else {
+			$("#radio_women").attr("checked","checked");
+			$("#radio_man").removeAttr("checked");
+		}
+        $("#radio_man").attr("disabled", true);
+        $("#radio_women").attr("disabled", true);
+
+		var edit_subject = rowdata["subject"];
+		if (edit_subject=="高等数学") {
+			$("#radio_math").attr("checked","checked");
+			$("#radio_eng").removeAttr("checked");
+			$("#radio_java").removeAttr("checked");
+		} else if (edit_subject=="java语言程序设计") {
+			$("#radio_java").attr("checked","checked");
+			$("#radio_math").removeAttr("checked");
+			$("#radio_eng").removeAttr("checked");
+		} else if (edit_subject=="大学英语") {
+			$("#radio_eng").attr("checked","checked");
+			$("#radio_math").removeAttr("checked");
+			$("#radio_java").removeAttr("checked");
+		};
+        $("#radio_math").attr("disabled", true);
+        $("#radio_eng").attr("disabled", true);
+        $("#radio_java").attr("disabled", true);
+
+		var edit_score = rowdata["score"];
+		$('#input_score').val(edit_score);
+
+	}
+	//提交编辑得学生信息
+	function editInfo() {//编辑信息，只修改信息，不会新增一行到表中
+		var major;
+		var majorValue = $('input:radio[name="radio_major"]:checked').val();
+		if (majorValue==1) {
+			major = "计算机";
+		} else if (majorValue==2) {
+			major = "物联网";
+		} else {
+			major = "通信";
+		};
+		
+		var grade = $("#select_grade option:selected").text();
+		var id = $("#input_id").val();
+	    var name = $("#input_name").val();
+
+		var sex;
+	    var sexValue = $('input:radio[name="radio_sex"]:checked').val();
+		if (sexValue==1) {
+			sex = "男";
+		} else {
+			sex = "女";
+		};
+
+        var subject;
+        var subjectValue = $('input:radio[name="radio_subject"]:checked').val();
+        if (subjectValue==1) {
+            subject = "java语言程序设计";
+        } else if (subjectValue==2) {
+            subject = "高等数学";
+        } else {
+            subject = "大学英语";
+        }
+
+		var score = $("#input_score").val();
+
+		var obj = {
+				"major":major,
+			  	"grade": grade,
+			  	"id": id,
+			  	"name": name,
+			  	"sex": sex,
+				"subject":subject,
+				"score":score
+			  };
+
+        var obj2 = {
+            "specialty":major,
+            "grade": grade,
+            "studentNo": id,
+            "studentName": name,
+            "studentSex": sex,
+            "subjectName": subject,
+            "studentScore": parseFloat(score)
+        };
+		if (checkId() && checkName() && checkScore()) {
+            console.log(JSON.stringify(obj2));
+            $(function() {
+                $.ajax({
+                    type: "POST",
+                    dataType: "text",
+                    url: "/sgms/ExecScoreServlet",
+                    contentType: "application/json;charset=utf-8",
+                    data: JSON.stringify(obj2),
+                    success: function (data) {
+                        alert("修改学生信息成功");
+                        if (data == "success") {
+                            reponse.editsavetr(obj, "table");
+                            $("input[name='input_id']").attr("disabled", false);
+                            $("input[name='input_name']").attr("disabled", false);
+                            $("#select_grade").attr("disabled", false);
+                            $("#radio_computer").attr("disabled", false);
+                            $("#radio_iot").attr("disabled", false);
+                            $("#radio_tongxin").attr("disabled", false);
+                            $("#radio_man").attr("disabled", false);
+                            $("#radio_women").attr("disabled", false);
+                            $("#radio_math").attr("disabled", false);
+                            $("#radio_eng").attr("disabled", false);
+                            $("#radio_java").attr("disabled", false);
+                            $('#input_id').val("");
+                            $('#input_name').val("");
+                            $('#input_score').val("");
+
+                        } else {
+                            return false;
+                        }
+                    },
+                    error: function () {
+                        alert("访问繁忙，请重试")
+                    }
+                });
+            });
+
+		};
+		//修改完成后提交按转换回来
+		document.getElementById("btn_edit").style.display = "none";
+        document.getElementById("btn_add").style.display = "block";
+		return false;
+	}
+
+	function addNew() {//清空表单中的信息
+		$('#input_id').val("");
+		$('#input_name').val("");
+		$('#input_score').val("");
+	}
+
+	function uptr(btn, e) {//改行上移
+		var tr = $(btn).parent().parent();
+		reponse.moveuptr(tr, "table");
+	}
+
+	function downtr(btn, e) {//改行下移
+		var tr = $(btn).parent().parent();
+		reponse.moveDown(tr, "table");
+	}
+	//删除学生成绩信息
+	function deletetr(a, e) {//删除改行信息
+        var tr = $(a).parent().parent();
+
+        var id = tr.children().eq(2).text();
+        var subject= tr.children().eq(5).text();
+		console.log(id, subject);
+
+		if(window.confirm('确定删除吗？')){
+            $(function() {
+                $.ajax({
+                    type: "POST",
+                    dataType: "text",
+                    url: "/sgms/DeleteScoreServlet",
+                    contentType: "application/x-www-form-urlencoded;charset=utf-8",
+                    data: "studentNo=" + id + "&subjectName=" + subject,
+                    success: function (data) {
+                        if (data == "success") {
+                            console.log("删除学生信息成功");
+                            reponse.deletetr(tr, e);
+                            return true;
+                        } else {
+                            alert("删除失败，请稍后重试");
+                            return false;
+                        }
+                    },
+                    error: function () {
+                        alert("访问繁忙，请重试");
+						return false;
+                    }
+                });
+            });
+		}else{
+     		return false;
+		}		
+	}
+	//获得统计数据
+    function getStudentStatisticsInfo() {
+        var studentSumStudentArray = [];
+        var studentSumScoreArray = [];
+        var subjectNameArray = [];
+        var avgScoreArray = [];
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/sgms/StudentStatisticsServlet",
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+				console.log(data);
+				var studentSum = data['studentSum'];
+				var subjectAvg = data['subjectAvg'];
+
+				for (var i=0; i<studentSum.length; i++) {
+                    studentSumStudentArray.push(studentSum[i]["studentName"] + "\n" + studentSum[i]["studentNo"]);
+                    studentSumScoreArray.push(studentSum[i]["sumScore"]);
+				}
+                for (var j=0; j<subjectAvg.length; j++) {
+                    subjectNameArray.push(subjectAvg[j]["subjectName"]);
+                    avgScoreArray.push(subjectAvg[j]["avgScore"]);
+                }
+
+				// console.log(studentSumStudentArray, studentSumScoreArray);
+				// console.log(subjectNameArray, avgScoreArray);
+				console.log(subjectNameArray);
+
+                var sum_option = {
+                    color: ['#3398DB'],
+                    tooltip : {
+                        trigger: 'axis',
+                        axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                            type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                        }
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    legend: {
+                        data:['总成绩']
+                    },
+                    xAxis : [
+                        {
+                            type : 'category',
+                            data : studentSumStudentArray,
+                            axisTick: {
+                                alignWithLabel: true
+                            }
+                        }
+                    ],
+                    yAxis : [
+                        {
+                            type : 'value'
+                        }
+                    ],
+                    series : [
+                        {
+                            name:'总成绩',
+                            type:'bar',
+                            barWidth: '60%',
+                            data: studentSumScoreArray
+                        }
+                    ]
+                };
+
+                var avg_option = {
+                    color: ['#3398DB'],
+                    tooltip : {
+                        trigger: 'axis',
+                        axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                            type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                        }
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '4%',
+                        containLabel: true
+                    },
+                    xAxis : [
+                        {
+                            type : 'category',
+                            data : subjectNameArray,
+                            axisTick: {
+                                alignWithLabel: true
+                            }
+                        }
+                    ],
+                    legend: {
+                        data:['平均成绩']
+                    },
+                    yAxis : [
+                        {
+                            type : 'value'
+                        }
+                    ],
+                    series : [
+                        {
+                            name:'平均成绩',
+                            type:'bar',
+                            barWidth: '60%',
+                            data: avgScoreArray
+                        }
+                    ]
+				};
+                console.log(avg_option);
+
+                app_sum.setOption(sum_option);
+                app_avg.setOption(avg_option);
+
+            },
+            error: function () {
+				alert("图表请求失败");
+            }
+        });
+	}
+	//执行统计的函数
+	function execStatistics() {
+		getStudentStatisticsInfo();
+		alert("更新统计信息成功");
+    }
+</script>
+<script type="text/javascript">
+</script>
+</html>
